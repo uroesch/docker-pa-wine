@@ -66,8 +66,8 @@ BUILD_ARGS=("$@")
 
 # Default values
 BUILD_CMD="docker build"
-DOCKER_REPO="${DOCKER_REPO:-docker-wine}"
-NO_RDP="${NO_RDP:-no}"
+DOCKER_REPO="${DOCKER_REPO:-pa-wine}"
+NO_RDP="${NO_RDP:-yes}"
 WINE_BRANCH="${WINE_BRANCH:-stable}"
 
 # Get the codename for latest version of wine-${WINE-BRANCH}
