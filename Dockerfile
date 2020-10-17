@@ -81,8 +81,6 @@ RUN \
   && cd /pa-build/scripts \
   && curl --location --remote-name "${url}" \
   && pwsh -ExecutionPolicy ByPass -File "$(basename ${url})" \
-  && 7z x -y -o/pa-build/PortableApps.comInstaller "$(find /pa-build/*Installer*exe)" \
-  && 7z x -y -o/pa-build/PortableApps.comLauncher "$(find /pa-build/*Launcher*exe)" \
   && rm /pa-build/*exe
 
 COPY pulse-client.conf /root/pulse/client.conf
