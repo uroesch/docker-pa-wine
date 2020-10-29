@@ -49,6 +49,7 @@ RUN \
     curl \
     jq \
     p7zip-full \
+    hub \
     liblttng-ust0 \
   && rm -rf /var/lib/apt/lists/*
 
