@@ -8,7 +8,14 @@ is_disabled () {
     echo "$1" | grep -q -i -E "^(no|off|false|0)$"
 }
 
+# -----------------------------------------------------------------------------
+# Environment Variables
+# -----------------------------------------------------------------------------
+export DISPLAY=:7777
 
+# -----------------------------------------------------------------------------
+# Globals
+# -----------------------------------------------------------------------------
 # Set user account and run values
 USER_NAME=${USER_NAME:-wineuser}
 USER_UID=${USER_UID:-1010}
@@ -19,7 +26,7 @@ RDP_SERVER=${RDP_SERVER:-no}
 RUN_AS_ROOT=${RUN_AS_ROOT:-no}
 FORCED_OWNERSHIP=${FORCED_OWNERSHIP:-no}
 TZ=${TZ:-UTC}
-USE_XVFB=${USE_XVFB:-no}
+USE_XVFB=${USE_XVFB:-yes}
 DUMMY_PULSEAUDIO=${DUMMY_PULSEAUDIO:-no}
 
 # Create the user account
@@ -54,7 +61,7 @@ if is_disabled "${RDP_SERVER}"; then
 
     # Run xvfb
     if is_enabled "${USE_XVFB}"; then
-        nohup /usr/bin/Xvfb "${XVFB_SERVER}" -screen "${XVFB_SCREEN}" "${XVFB_RESOLUTION}" >/dev/null 2>&1 &
+        nohup /usr/bin/Xvfb ${DISPLAY} >/dev/null 2>&1 &
     fi
 
     # Generate .Xauthority using xauth with .Xkey sourced from host
