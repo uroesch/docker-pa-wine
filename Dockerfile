@@ -11,7 +11,7 @@ RUN apt-get update \
         git \
         gosu \
         gpg-agent \
-        p7zip \
+        p7zip-full \
         pulseaudio \
         pulseaudio-utils \
         software-properties-common \
@@ -21,6 +21,10 @@ RUN apt-get update \
         winbind \
         xvfb \
         zenity \
+        curl \
+        jq \
+        hub \
+        liblttng-ust0 \
     && rm -rf /var/lib/apt/lists/*
 
 # Install wine
@@ -37,37 +41,14 @@ COPY download_gecko_and_mono.sh /root/download_gecko_and_mono.sh
 RUN chmod +x /root/download_gecko_and_mono.sh \
     && /root/download_gecko_and_mono.sh "$(dpkg -s wine-${WINE_BRANCH} | grep "^Version:\s" | awk '{print $2}' | sed -E 's/~.*$//')"
 
-# install dependencies and tools for powershell
-RUN \
-  apt-get update \
-  && DEBIAN_FRONTEND="noninteractive" apt-get install -y --no-install-recommends \
-    curl \
-    jq \
-    p7zip-full \
-    hub \
-    liblttng-ust0 \
-  && rm -rf /var/lib/apt/lists/*
-
-# install the powershell dependencies not provided in 20.04
-RUN \
-  base_url="http://archive.ubuntu.com/ubuntu/pool/main"; \
-  for path in \
-    "/o/openssl1.0/libssl1.0.0_1.0.2n-1ubuntu5.4_amd64.deb" \
-    "/i/icu/libicu60_60.2-3ubuntu3.1_amd64.deb"; do \
-    curl --silent --location --remote-name "${base_url}${path}" \
-    && echo "$(basename ${path})" \
-    && dpkg -i "$(basename ${path})" \
-    && rm "$(basename ${path})"; \
-  done
-
 # install powershell
 RUN \
   curl --silent "https://api.github.com/repos/PowerShell/PowerShell/releases/latest" | \
-  jq '.assets[] | select(.name|match("lts.*18.04")) | .browser_download_url' | \
+  jq '.assets[] | select(.name|match("ubuntu.20.04")) | .browser_download_url' | \
     sed -r 's/(^"|"$)//g' | \
     while read url; do \
       curl --silent --location --remote-name "${url}"; \
-      dpkg -i "$(basename "${url}")"; \
+      apt-get install -y ./"$(basename "${url}")"; \
       rm "$(basename "${url}")"; \
     done
 
