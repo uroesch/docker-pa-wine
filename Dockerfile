@@ -36,11 +36,6 @@ RUN wget -nv -O- https://dl.winehq.org/wine-builds/winehq.key | APT_KEY_DONT_WAR
     && DEBIAN_FRONTEND="noninteractive" apt-get install -y --install-recommends winehq-${WINE_BRANCH} \
     && rm -rf /var/lib/apt/lists/*
 
-# Download gecko and mono installers
-COPY download_gecko_and_mono.sh /root/download_gecko_and_mono.sh
-RUN chmod +x /root/download_gecko_and_mono.sh \
-    && /root/download_gecko_and_mono.sh "$(dpkg -s wine-${WINE_BRANCH} | grep "^Version:\s" | awk '{print $2}' | sed -E 's/~.*$//')"
-
 # install powershell
 RUN \
   curl --silent "https://api.github.com/repos/PowerShell/PowerShell/releases/latest" | \
