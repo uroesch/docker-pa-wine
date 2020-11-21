@@ -6,8 +6,8 @@ FROM ${BASE_IMAGE}:${TAG}
 ARG WINE_BRANCH="stable"
 #        hub \
 RUN \
-  apt-get update \
-  && DEBIAN_FRONTEND="noninteractive" apt-get install -y --no-install-recommends \
+  apt update \
+  && DEBIAN_FRONTEND="noninteractive" apt install -y --no-install-recommends \
     ca-certificates \
     curl \
     git \
@@ -18,15 +18,15 @@ RUN \
     tzdata \
     unzip \
     xvfb \
-  && apt-get -y autoclean \
+  && apt -y autoclean \
   && rm -rf /var/lib/apt/lists/*
 
 # install wine
 RUN \
   dpkg --add-architecture i386 \
-  && apt-get update \
-  && apt-get -y install wine32 \
-  && apt-get -y autoclean \
+  && apt update \
+  && DEBIAN_FRONTEND="noninteractive" apt -y install wine32 \
+  && apt -y autoclean \
   && rm -rf /var/lib/apt/lists/*
 
 # install the powershell dependencies not provided in 20.04
@@ -37,19 +37,19 @@ RUN \
     "/i/icu/libicu60_60.2-3ubuntu3.1_amd64.deb"; do \
     curl --silent --location --remote-name "${base_url}${path}" \
     && echo "$(basename ${path})" \
-    && dpkg -i "$(basename ${path})" \
+    && DEBIAN_FRONTEND="noninteractive" dpkg -i "$(basename ${path})" \
     && rm "$(basename ${path})"; \
   done
 
 # install powershell
 RUN \
-  curl --silent "https://api.github.com/repos/PowerShell/PowerShell/releases/latest" | \
+  curl --verbose "https://api.github.com/repos/PowerShell/PowerShell/releases/latest" | \
   jq '.assets[] | select(.name|match("ubuntu.18.04")) | .browser_download_url' | \
     sed -r 's/(^"|"$)//g' | \
     while read url; do \
       echo url: ${url}; \
-      curl --silent --location --remote-name "${url}"; \
-      apt-get install -y ./"$(basename "${url}")"; \
+      curl --verbose --silent --location --remote-name "${url}"; \
+      apt install -y ./"$(basename "${url}")"; \
       rm "$(basename "${url}")"; \
     done
 
