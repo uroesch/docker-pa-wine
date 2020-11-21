@@ -19,15 +19,17 @@ RUN \
     unzip \
     xvfb \
   && apt -y autoclean \
+  && apt -y autoremove \
   && rm -rf /var/lib/apt/lists/*
 
 # install wine
 RUN \
   dpkg --add-architecture i386 \
   && apt update \
-  && DEBIAN_FRONTEND="noninteractive" apt -y install libgcc-s1:i386 \
+  && DEBIAN_FRONTEND="noninteractive" apt -y install libgcc-s1:i386 || : \
   && DEBIAN_FRONTEND="noninteractive" apt -y install wine32 \
   && apt -y autoclean \
+  && apt -y autoremove \
   && rm -rf /var/lib/apt/lists/*
 
 # install the powershell dependencies not provided in 20.04
