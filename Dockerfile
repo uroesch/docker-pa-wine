@@ -25,6 +25,7 @@ RUN \
 RUN \
   dpkg --add-architecture i386 \
   && apt update \
+  && DEBIAN_FRONTEND="noninteractive" apt -y install libgcc-s1:i386 \
   && DEBIAN_FRONTEND="noninteractive" apt -y install wine32 \
   && apt -y autoclean \
   && rm -rf /var/lib/apt/lists/*
