@@ -54,12 +54,16 @@ RUN \
     done
 
 RUN \
+  pa_dir=/pa-build; \
   url="https://raw.githubusercontent.com/uroesch/PortableApps/master/scripts/download-pa-dev-pkgs.ps1"; \
-  mkdir -p /pa-build/scripts \
-  && cd /pa-build/scripts \
-  && curl --location --remote-name "${url}" \
+  mkdir -p ${pa_dir}/scripts \
+  && cd ${pa_dir}/scripts \
+  && curl --silent --location --remote-name "${url}" \
   && pwsh -ExecutionPolicy ByPass -File "$(basename ${url})" \
-  && rm /pa-build/*exe
+  && rm ${pa_dir}/*exe \
+  && find ${pa_dir} -type f | while IFS=$'\n' read file; do chmod go+r "${file}"; done \
+  && find ${pa_dir} -type d -o -name ".exe" | while IFS=$'\n' read file; do chmod go+rx "${file}"; done
+  # neither -exec or xargs did the job so I simply loop through files :(
 
 COPY entrypoint.sh /usr/bin/entrypoint
 ENTRYPOINT ["/usr/bin/entrypoint"]
