@@ -58,12 +58,10 @@ RUN \
 
 RUN \
   pa_dir=/pa-build; \
-  url="https://raw.githubusercontent.com/uroesch/PortableApps/master/scripts/download-pa-dev-pkgs.ps1"; \
-  mkdir -p ${pa_dir}/scripts \
-  && cd ${pa_dir}/scripts \
-  && curl --silent --location --remote-name "${url}" \
-  && pwsh -ExecutionPolicy ByPass -File "$(basename ${url})" \
-  && rm ${pa_dir}/*exe \
+  mkdir -p ${pa_dir} \
+  && cd ${pa_dir} \
+  && git clone https://github.com/uroesch/PortableApps.comInstaller.git \
+  && git clone -b patched https://github.com/uroesch/PortableApps.comLauncher.git \
   && find ${pa_dir} -type f | while IFS=$'\n' read file; do chmod go+r "${file}"; done \
   && find ${pa_dir} -type d -o -name ".exe" | while IFS=$'\n' read file; do chmod go+rx "${file}"; done
   # neither -exec or xargs did the job so I simply loop through files :(
