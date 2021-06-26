@@ -1,23 +1,25 @@
 ARG BASE_IMAGE="ubuntu"
-ARG TAG="18.04"
+ARG TAG="20.04"
 FROM ${BASE_IMAGE}:${TAG}
+
+ENV DEBIAN_FRONTEND="noninteractive"
 
 # Install prerequisites
 ARG WINE_BRANCH="stable"
 #        hub \
 RUN \
   apt update \
-  && DEBIAN_FRONTEND="noninteractive" apt install -y --no-install-recommends \
-    ca-certificates \
-    curl \
-    git \
-    gosu \
-    jq \
-    liblttng-ust0 \
-    p7zip-full \
-    tzdata \
-    unzip \
-    xvfb \
+  && apt install -y --no-install-recommends \
+     ca-certificates \
+     curl \
+     git \
+     gosu \
+     jq \
+     liblttng-ust0 \
+     p7zip-full \
+     tzdata \
+     unzip \
+     xvfb \
   && apt -y autoclean \
   && apt -y autoremove \
   && rm -rf /var/lib/apt/lists/*
@@ -26,28 +28,16 @@ RUN \
 RUN \
   dpkg --add-architecture i386 \
   && apt update \
-  && DEBIAN_FRONTEND="noninteractive" apt -y install libgcc-s1:i386 || : \
-  && DEBIAN_FRONTEND="noninteractive" apt -y install wine32 \
+  && apt -y install libgcc-s1:i386 || : \
+  && apt -y install wine32 \
   && apt -y autoclean \
   && apt -y autoremove \
   && rm -rf /var/lib/apt/lists/*
 
-# install the powershell dependencies not provided in 20.04
-RUN \
-  base_url="http://archive.ubuntu.com/ubuntu/pool/main"; \
-  for path in \
-    "/o/openssl1.0/libssl1.0.0_1.0.2n-1ubuntu5.4_amd64.deb" \
-    "/i/icu/libicu60_60.2-3ubuntu3.1_amd64.deb"; do \
-    curl --silent --location --remote-name "${base_url}${path}" \
-    && echo "$(basename ${path})" \
-    && DEBIAN_FRONTEND="noninteractive" dpkg -i "$(basename ${path})" \
-    && rm "$(basename ${path})"; \
-  done
-
 # install powershell
 RUN \
   curl --verbose "https://api.github.com/repos/PowerShell/PowerShell/releases/latest" | \
-  jq '.assets[] | select(.name|match("ubuntu.18.04")) | .browser_download_url' | \
+  jq '.assets[] | select(.name|match("ubuntu.20.04")) | .browser_download_url' | \
     sed -r 's/(^"|"$)//g' | \
     while read url; do \
       echo url: ${url}; \
