@@ -19,6 +19,8 @@ RUN \
      p7zip-full \
      tzdata \
      unzip \
+     x11-apps \
+     x11-utils \
      xvfb \
   && apt -y autoclean \
   && apt -y autoremove \
