@@ -1,0 +1,73 @@
+# -----------------------------------------------------------------------------
+# Run nightly build verification
+# Author: Urs Roesch https://github.com/uroesch
+# Version: 0.1.0
+# -----------------------------------------------------------------------------
+# vim: set shiftwidth=2 softtabstop=2 expandtabs :
+
+name: docker-build
+
+on:
+  push:
+    branches:
+    - workflow/*
+  pull_request:
+    branches:
+    - main
+  schedule:
+    - cron: '17 4 * * 1' # build once per week on Monday
+  workflow_dispatch:
+
+
+jobs:
+  docker-build:
+    timeout-minutes: 90
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: true
+
+    steps:
+      - name: Set docker name
+        shell: bash
+        run: |2+
+          DOCKER_NAME=${GITHUB_REPOSITORY#*/}
+          DOCKER_NAME=${DOCKER_NAME/docker-/}
+          DOCKER_NAME=${DOCKER_NAME/:refs/}
+          printf '%s=%s\n' \
+            DOCKER_NAME "${DOCKER_NAME}" \
+            >> $GITHUB_ENV
+
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+
+      - name: Set up docker-buildx
+        id: buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Setup buildx cache
+        uses: actions/cache@v2
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-
+
+      - name: Build and push
+        id: container_build
+        uses: docker/build-push-action@v2
+        with:
+          context: ./
+          file: ./Dockerfile
+          push: ${{ github.base_ref != '' }}
+          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/${{ env.DOCKER_NAME }}:latest
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache
+
+      - name: Image digest
+        run: echo ${{ steps.container_build.outputs.digest }}
