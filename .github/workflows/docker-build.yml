@@ -1,7 +1,7 @@
 # -----------------------------------------------------------------------------
 # Run nightly build verification
 # Author: Urs Roesch https://github.com/uroesch
-# Version: 0.1.0
+# Version: 0.3.0
 # -----------------------------------------------------------------------------
 # vim: set shiftwidth=2 softtabstop=2 expandtabs :
 
@@ -36,6 +36,7 @@ jobs:
           printf '%s=%s\n' \
             DOCKER_NAME "${DOCKER_NAME}" \
             >> $GITHUB_ENV
+          env | grep GITHUB
 
       - name: Checkout repository
         uses: actions/checkout@v2
@@ -64,7 +65,7 @@ jobs:
         with:
           context: ./
           file: ./Dockerfile
-          push: ${{ github.base_ref != '' }}
+          push: ${{ github.event_name == 'pull_request' || github.event_name == 'schedule' }}
           tags: ${{ secrets.DOCKER_HUB_USERNAME }}/${{ env.DOCKER_NAME }}:latest
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache
