@@ -39,7 +39,7 @@ RUN \
 # install powershell
 RUN \
   curl --verbose "https://api.github.com/repos/PowerShell/PowerShell/releases/latest" | \
-  jq '.assets[] | select(.name|match("ubuntu.20.04")) | .browser_download_url' | \
+  jq '.assets[] | select(.name|match("lts.*deb")) | .browser_download_url' | \
     sed -r 's/(^"|"$)//g' | \
     while read url; do \
       echo url: ${url}; \
