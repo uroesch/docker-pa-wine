@@ -1,5 +1,5 @@
 ARG BASE_IMAGE="ubuntu"
-ARG TAG="20.04"
+ARG TAG="21.10"
 FROM ${BASE_IMAGE}:${TAG}
 
 ENV DEBIAN_FRONTEND="noninteractive"
