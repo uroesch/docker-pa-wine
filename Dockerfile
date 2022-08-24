@@ -1,5 +1,5 @@
 ARG BASE_IMAGE="ubuntu"
-ARG TAG="21.10"
+ARG TAG="22.04"
 FROM ${BASE_IMAGE}:${TAG}
 
 ENV DEBIAN_FRONTEND="noninteractive"
@@ -15,7 +15,7 @@ RUN \
      git \
      gosu \
      jq \
-     liblttng-ust0 \
+     liblttng-ust1 \
      p7zip-full \
      tzdata \
      unzip \
@@ -38,12 +38,11 @@ RUN \
 
 # install powershell
 RUN \
-  curl --verbose "https://api.github.com/repos/PowerShell/PowerShell/releases/latest" | \
-  jq '.assets[] | select(.name|match("lts.*deb")) | .browser_download_url' | \
-    sed -r 's/(^"|"$)//g' | \
+  curl --silent "https://api.github.com/repos/PowerShell/PowerShell/releases/latest" | \
+  jq -r '.assets[] | select(.name|match("lts.*deb")) | .browser_download_url' | \
     while read url; do \
       echo url: ${url}; \
-      curl --verbose --silent --location --remote-name "${url}"; \
+      curl --silent --location --remote-name "${url}"; \
       apt install -y ./"$(basename "${url}")"; \
       rm "$(basename "${url}")"; \
     done
