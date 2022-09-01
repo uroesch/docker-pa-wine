@@ -24,6 +24,7 @@ RUN \
      xvfb \
   && apt -y autoclean \
   && apt -y autoremove \
+  && find /var/cache/apt/archives -type f -delete \
   && rm -rf /var/lib/apt/lists/*
 
 # install wine
@@ -34,6 +35,7 @@ RUN \
   && apt -y install wine32 \
   && apt -y autoclean \
   && apt -y autoremove \
+  && find /var/cache/apt/archives -type f -delete \
   && rm -rf /var/lib/apt/lists/*
 
 # install powershell
