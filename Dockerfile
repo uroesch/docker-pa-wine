@@ -1,5 +1,5 @@
 ARG BASE_IMAGE="ubuntu"
-ARG TAG="22.04"
+ARG TAG="22.10"
 FROM ${BASE_IMAGE}:${TAG}
 
 ENV DEBIAN_FRONTEND="noninteractive"
