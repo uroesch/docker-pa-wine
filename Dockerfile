@@ -1,12 +1,11 @@
 ARG BASE_IMAGE="ubuntu"
-ARG TAG="22.10"
+ARG TAG="22.04"
 FROM ${BASE_IMAGE}:${TAG}
 
 ENV DEBIAN_FRONTEND="noninteractive"
 
 # Install prerequisites
 ARG WINE_BRANCH="stable"
-#        hub \
 RUN \
   apt update \
   && apt install -y --no-install-recommends \
@@ -41,7 +40,7 @@ RUN \
 # install powershell
 RUN \
   curl --silent "https://api.github.com/repos/PowerShell/PowerShell/releases/latest" | \
-  jq -r '.assets[] | select(.name|match("lts.*deb")) | .browser_download_url' | \
+  jq -r '.assets[] | select(.name|match("(lts)?.*deb")) | .browser_download_url' | \
     while read url; do \
       echo url: ${url}; \
       curl --silent --location --remote-name "${url}"; \
