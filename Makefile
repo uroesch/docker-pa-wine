@@ -2,9 +2,11 @@ DOCKER_USER    := uroesch
 DOCKER_TAG     := pa-wine
 DOCKER_VERSION ?= $(shell date +%F)
 
-push-as-latest: push
+to-latest:
 	docker tag $(DOCKER_USER)/$(DOCKER_TAG):$(DOCKER_VERSION) \
 		$(DOCKER_USER)/$(DOCKER_TAG):latest
+
+push-as-latest: to-latest push
 	docker push $(DOCKER_USER)/$(DOCKER_TAG):latest
 
 push-only:
