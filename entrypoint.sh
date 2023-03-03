@@ -1,23 +1,26 @@
 #!/usr/bin/env bash
 
 # -----------------------------------------------------------------------------
-# Environment Variables
-# -----------------------------------------------------------------------------
-export DISPLAY=:7777
-export WINEDLLOVERRIDES="mscoree,mshtml="
-
-# -----------------------------------------------------------------------------
 # Globals
 # -----------------------------------------------------------------------------
 # Set user account and run values
-USER_NAME=${USER_NAME:-wineuser}
-USER_UID=${USER_UID:-1010}
-USER_GID=${USER_GID:-"${USER_UID}"}
-USER_HOME=${USER_HOME:-/home/"${USER_NAME}"}
-USER_PASSWD=${USER_PASSWD:-"$(openssl passwd -1 -salt "$(openssl rand -base64 6)" "${USER_NAME}")"}
-RUN_AS_ROOT=${RUN_AS_ROOT:-no}
-FORCED_OWNERSHIP=${FORCED_OWNERSHIP:-no}
-TZ=${TZ:-UTC}
+declare -r VERSION="0.3.1"
+declare -r AUTHOR="Urs Roesch"
+declare -r USER_NAME=${USER_NAME:-wineuser}
+declare -r USER_UID=${USER_UID:-1010}
+declare -r USER_GID=${USER_GID:-"${USER_UID}"}
+declare -r USER_HOME=${USER_HOME:-/home/"${USER_NAME}"}
+declare -r USER_PASSWD=${USER_PASSWD:-"$(openssl passwd -1 -salt "$(openssl rand -base64 6)" "${USER_NAME}")"}
+declare -r RUN_AS_ROOT=${RUN_AS_ROOT:-no}
+declare -r FORCED_OWNERSHIP=${FORCED_OWNERSHIP:-no}
+
+# -----------------------------------------------------------------------------
+# Environment Variables
+# -----------------------------------------------------------------------------
+export TZ=${TZ:-UTC}
+export DISPLAY=:7777
+export WINEDLLOVERRIDES="mscoree,mshtml="
+export HOME=${USER_HOME}
 
 # -----------------------------------------------------------------------------
 # Functions
@@ -31,6 +34,7 @@ function is_disabled() {
 }
 
 function create_user() {
+  is_enabled "${RUN_AS_ROOT}" && return 0
   # Create the user account
   ! grep -q ":${USER_GID}:$" /etc/group && \
     groupadd --gid "${USER_GID}" "${USER_NAME}"
@@ -45,10 +49,11 @@ function create_user() {
 }
 
 function create_homedir() {
+  is_enabled "${RUN_AS_ROOT}" && return 0
   # Create the user's home if it doesn't exist
   [ ! -d "${USER_HOME}" ] && mkdir -p "${USER_HOME}"
 
-  # Take ownership of user's home directory if owned by root or 
+  # Take ownership of user's home directory if owned by root or
   # if FORCED_OWNERSHIP is enabled
   OWNER_IDS="$(stat -c "%u:%g" "${USER_HOME}")"
   if [[ ${OWNER_IDS} != ${USER_UID}:${USER_GID} ]]; then
@@ -70,7 +75,7 @@ function configure_timezone() {
     echo "${TZ}" > /etc/timezone
 }
 
-function start_x() { 
+function start_x() {
   nohup /usr/bin/Xvfb ${DISPLAY} >/dev/null 2>&1 &
 }
 

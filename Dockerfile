@@ -58,5 +58,5 @@ RUN \
   && find ${pa_dir} -type d -o -name ".exe" | while IFS=$'\n' read file; do chmod go+rx "${file}"; done
   # neither -exec or xargs did the job so I simply loop through files :(
 
-COPY entrypoint.sh /usr/bin/entrypoint
-ENTRYPOINT ["/usr/bin/entrypoint"]
+COPY entrypoint.sh /entrypoint.sh
+ENTRYPOINT ["/entrypoint.sh"]
