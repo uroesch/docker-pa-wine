@@ -1,10 +1,20 @@
 #!/usr/bin/env bash
 
 # -----------------------------------------------------------------------------
+# Setup
+# -----------------------------------------------------------------------------
+set -o errexit
+set -o errtrace
+set -o nounset
+set -o pipefail
+
+trap cleanup SIGINT SIGABRT SIGTERM SIGUSR1
+
+# -----------------------------------------------------------------------------
 # Globals
 # -----------------------------------------------------------------------------
 # Set user account and run values
-declare -r VERSION="0.3.1"
+declare -r VERSION="0.3.3"
 declare -r AUTHOR="Urs Roesch"
 declare -r USER_NAME=${USER_NAME:-wineuser}
 declare -r USER_UID=${USER_UID:-1010}
@@ -83,12 +93,18 @@ function run_command() {
   # Run in X11 redirection mode as $USER_NAME (default)
   if is_disabled "${RUN_AS_ROOT}"; then
     # Run in X11 redirection mode as user
-    exec gosu "${USER_NAME}" "${@}"
+    gosu "${USER_NAME}" "${@}"
     # Run in X11 redirection mode as root
   elif is_enabled "${RUN_AS_ROOT}"; then
-    exec "${@}"
+    "${@}"
   fi
 }
+
+function cleanup() {
+  local exit_code=$?
+  echo ${exit_code}
+}
+
 
 # -----------------------------------------------------------------------------
 # main
