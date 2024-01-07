@@ -48,6 +48,15 @@ RUN \
       rm "$(basename "${url}")"; \
     done
 
+# download and install innounp
+RUN \
+  rar=/var/tmp/innounp.rar; \
+  curl --location --silent --output ${rar} \
+   "https://sourceforge.net/projects/innounp/files/latest/download"; \
+  7z x -o/usr/local/bin ${rar} innounp.exe; \
+  chmod 755 /usr/local/bin/innounp.exe; \
+  rm ${rar}
+
 RUN \
   pa_dir=/pa-build; \
   mkdir -p ${pa_dir} \

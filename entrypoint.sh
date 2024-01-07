@@ -14,7 +14,7 @@ trap cleanup SIGINT SIGABRT SIGTERM SIGUSR1
 # Globals
 # -----------------------------------------------------------------------------
 # Set user account and run values
-declare -r VERSION="0.3.3"
+declare -r VERSION="0.3.4"
 declare -r AUTHOR="Urs Roesch"
 declare -r USER_NAME=${USER_NAME:-wineuser}
 declare -r USER_UID=${USER_UID:-1010}
@@ -43,11 +43,14 @@ function is_disabled() {
   [[ ${1} =~ ^(no|off|false|0)$ ]]
 }
 
+function create_group() {
+  grep -q ":${USER_GID}:$" /etc/group && return 0 || :
+  groupadd --gid "${USER_GID}" "${USER_NAME}"
+}
+
 function create_user() {
   is_enabled "${RUN_AS_ROOT}" && return 0
-  # Create the user account
-  ! grep -q ":${USER_GID}:$" /etc/group && \
-    groupadd --gid "${USER_GID}" "${USER_NAME}"
+  create_group
   useradd \
     --shell /bin/bash \
     --uid "${USER_UID}" \
